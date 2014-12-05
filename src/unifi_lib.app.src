@@ -1,0 +1,15 @@
+{application, unifi_lib,
+ [
+  {description, "UniFi controller API"},
+  {vsn, "0.1"},
+  {registered, [unifi_lib]},
+  {modules,[
+    unifi
+  ]},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { unifi_lib, []}},
+  {env, []}
+]}.
