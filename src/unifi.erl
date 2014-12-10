@@ -34,7 +34,7 @@ login(Url, Login, Pass) -> login(Url, Login, Pass, v2, "").
 %% For v2/v3 API
 -spec(login(Url :: string, Login :: string(), Pass :: string(), Version :: version(), Site :: string()) -> {ok, opt_list()} | {error, Reply :: string()}).
 login(Url, Login, Pass, Version, Site) ->
-    try [ok,ok,ok,ok,ok] = [application:ensure_started(A) || A <- [asn1, public_key, ssl, crypto, ibrowse]] of
+    try [ok,ok,ok,ok,ok] = [application:ensure_started(A) || A <- [asn1, crypto, public_key, ssl, ibrowse]] of
         _ ->
             Path = case Version of
                        v3 -> "api/s/" ++ Site ++ "/";
