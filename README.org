@@ -54,5 +54,5 @@
    #+END_EXAMPLE
    ,or something else.
 
-Sorry, but description of each function, now, read in comments of source code.
+Description of each function see in doc/ directory.
 Author: Andrey Andruschenko <apofiget@gmail.com>, license: GPLv2.
