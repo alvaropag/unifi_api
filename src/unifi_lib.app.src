@@ -1,7 +1,7 @@
 {application, unifi_lib,
  [
   {description, "UniFi controller API"},
-  {vsn, "0.1"},
+  {vsn, "0.3"},
   {registered, [unifi_lib]},
   {modules,[
     unifi
