@@ -13,7 +13,7 @@
 <ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>UniFi controller API, tested with v2.4.6.
 
 <p><b>Version:</b> 0.3</p>
-<p><b>Authors:</b> AndreyAndruschenko (<a href="mailto:apofiget@gmail.com"><tt>apofiget@gmail.com</tt></a>).</p>
+<p><b>Authors:</b> Andrey Andruschenko (<a href="mailto:apofiget@gmail.com"><tt>apofiget@gmail.com</tt></a>).</p>
 <p><b>References</b><ul><li><a href="http://www.ubnt.com/download/?group=unifi-ap">UniFi controller download</a>;</li><li><a href="http://wiki.ubnt.com/UniFi_FAQ">UniFi FAQ</a>;</li><li><a href="http://community.ubnt.com/t5/tkb/communitypage">UniFi community knowledge base</a></li></ul></p>
 
 <h2><a name="description">Description</a></h2>UniFi controller API, tested with v2.4.6
@@ -26,6 +26,10 @@
 <h3 class="typedecl"><a name="type-option">option()</a></h3>
 <p><tt>option() = {url, Url::string()} | {cookie, Cookie::string()} | {path, Path::string()}</tt></p>
 <p>  Controller session options</p>
+
+<h3 class="typedecl"><a name="type-token">token()</a></h3>
+<p><tt>token() = list()</tt></p>
+<p>  Voucher creation token</p>
 
 <h3 class="typedecl"><a name="type-user_type">user_type()</a></h3>
 <p><tt>user_type() = all | guest | user | noted | blocked</tt></p>
@@ -126,7 +130,7 @@
 
 <h3 class="function"><a name="gen_voucher-3">gen_voucher/3</a></h3>
 <div class="spec">
-<p><tt>gen_voucher(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer()) -&gt; {ok, [tuple()]} | {error, Reply::string()}</tt><br></p>
+<p><tt>gen_voucher(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer()) -&gt; {ok, <a href="#type-token">token()</a>} | {error, Reply::string()}</tt><br></p>
 </div><p>Generate voucher(s)<br>
   Expires -- Minutes to voucher expires<br>
   Count   -- count vouchers to generate<br>
@@ -134,7 +138,7 @@
 
 <h3 class="function"><a name="gen_voucher-5">gen_voucher/5</a></h3>
 <div class="spec">
-<p><tt>gen_voucher(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer(), Up::integer(), Down::integer()) -&gt; {ok, [tuple()]} | {error, Reply::string()}</tt><br></p>
+<p><tt>gen_voucher(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer(), Up::integer(), Down::integer()) -&gt; {ok, <a href="#type-token">token()</a>} | {error, Reply::string()}</tt><br></p>
 </div><p>Generate voucher(s)<br>
   Expires -- Minutes to voucher expires<br>
   Count   -- count vouchers to generate<br>
@@ -144,7 +148,7 @@
 
 <h3 class="function"><a name="gen_voucher-6">gen_voucher/6</a></h3>
 <div class="spec">
-<p><tt>gen_voucher(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer(), Up::integer(), Down::integer(), Quota::integer()) -&gt; {ok, [tuple()]} | {error, Reply::string()}</tt><br></p>
+<p><tt>gen_voucher(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer(), Up::integer(), Down::integer(), Quota::integer()) -&gt; {ok, <a href="#type-token">token()</a>} | {error, Reply::string()}</tt><br></p>
 </div><p>Generate voucher(s)<br>
   Expires -- Minutes to voucher expires<br>
   Count   -- count vouchers to generate<br>
@@ -155,7 +159,7 @@
 
 <h3 class="function"><a name="gen_voucher_ot-3">gen_voucher_ot/3</a></h3>
 <div class="spec">
-<p><tt>gen_voucher_ot(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer()) -&gt; {ok, [tuple()]} | {error, Reply::string()}</tt><br></p>
+<p><tt>gen_voucher_ot(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer()) -&gt; {ok, <a href="#type-token">token()</a>} | {error, Reply::string()}</tt><br></p>
 </div><p>Generate one-time used voucher(s)<br>
   Expires -- Minutes to voucher expires<br>
   Count   -- count vouchers to generate<br>
@@ -163,7 +167,7 @@
 
 <h3 class="function"><a name="gen_voucher_ot-5">gen_voucher_ot/5</a></h3>
 <div class="spec">
-<p><tt>gen_voucher_ot(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer(), Up::integer(), Down::integer()) -&gt; {ok, [tuple()]} | {error, Reply::string()}</tt><br></p>
+<p><tt>gen_voucher_ot(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer(), Up::integer(), Down::integer()) -&gt; {ok, <a href="#type-token">token()</a>} | {error, Reply::string()}</tt><br></p>
 </div><p>Generate one-time used voucher(s)<br>
   Expires -- Minutes to voucher expires<br>
   Count   -- count vouchers to generate<br>
@@ -173,7 +177,7 @@
 
 <h3 class="function"><a name="gen_voucher_ot-6">gen_voucher_ot/6</a></h3>
 <div class="spec">
-<p><tt>gen_voucher_ot(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer(), Up::integer(), Down::integer(), Quota::integer()) -&gt; {ok, [tuple()]} | {error, Reply::string()}</tt><br></p>
+<p><tt>gen_voucher_ot(Opts::<a href="#type-opt_list">opt_list()</a>, Expires::integer(), Count::integer(), Up::integer(), Down::integer(), Quota::integer()) -&gt; {ok, <a href="#type-token">token()</a>} | {error, Reply::string()}</tt><br></p>
 </div><p>Generate one-time used voucher(s)<br>
   Expires -- Minutes to voucher expires<br>
   Count   -- count vouchers to generate<br>
@@ -239,7 +243,7 @@
 
 <h3 class="function"><a name="get_voucher-2">get_voucher/2</a></h3>
 <div class="spec">
-<p><tt>get_voucher(Opts::<a href="#type-opt_list">opt_list()</a>, Token::integer()) -&gt; {ok, [tuple()]} | {error, Reply::string()}</tt><br></p>
+<p><tt>get_voucher(Opts::<a href="#type-opt_list">opt_list()</a>, Token::<a href="#type-token">token()</a>) -&gt; {ok, [tuple()]} | {error, Reply::string()}</tt><br></p>
 </div><p>Return generated voucher(s)</p>
 
 <h3 class="function"><a name="get_wlans-1">get_wlans/1</a></h3>
@@ -282,6 +286,6 @@
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
-<p><i>Generated by EDoc, Dec 10 2014, 14:57:46.</i></p>
+<p><i>Generated by EDoc, Dec 10 2014, 15:20:32.</i></p>
 </body>
 </html>

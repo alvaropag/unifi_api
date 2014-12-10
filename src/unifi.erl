@@ -1,5 +1,5 @@
 %% -*- coding: utf-8 -*-
-%% @author AndreyAndruschenko <apofiget@gmail.com>
+%% @author Andrey Andruschenko <apofiget@gmail.com>
 %% @version 0.3
 %% @doc UniFi controller API, tested with v2.4.6
 %% @reference <a href="http://www.ubnt.com/download/?group=unifi-ap">UniFi controller download</a>;
@@ -29,6 +29,8 @@
 -type opt_list() :: [option()].
 -type option() :: {url, Url :: string()} | {cookie, Cookie :: string()} | {path, Path :: string()}.
 %% Controller session options
+-type token() :: list().
+%% Voucher creation token
 
 %% @doc Open session. Return session options or error.
 %% Use it first before send other request.
@@ -239,9 +241,12 @@ unauth_guest(Opts, Mac) ->
 %% Count   -- count vouchers to generate<br/>
 %% Return token: create_time<br/>
 %% @end
--spec(gen_voucher(Opts :: opt_list(), Expires :: integer(), Count :: integer()) -> {ok, [tuple()]} | {error, Reply :: string()}).
+-spec(gen_voucher(Opts :: opt_list(), Expires :: integer(), Count :: integer()) -> {ok, token()} | {error, Reply :: string()}).
 gen_voucher(Opts, Expires, Count) ->
-    get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'quota': 0}")).
+    case get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'quota': 0}")) of
+        {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
+        Any -> Any
+    end.
 
 %% @doc Generate voucher(s)<br/>
 %% Expires -- Minutes to voucher expires<br/>
@@ -250,9 +255,12 @@ gen_voucher(Opts, Expires, Count) ->
 %% Down    -- download bandwith, kbps<br/>
 %% Return token: create_time<br/>
 %% @end
--spec(gen_voucher(Opts :: opt_list(), Expires :: integer(), Count :: integer(), Up :: integer(), Down :: integer()) -> {ok, [tuple()]} | {error, Reply :: string()}).
+-spec(gen_voucher(Opts :: opt_list(), Expires :: integer(), Count :: integer(), Up :: integer(), Down :: integer()) -> {ok, token()} | {error, Reply :: string()}).
 gen_voucher(Opts, Expires, Count, Up, Down) ->
-    get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'up':" ++ integer_to_list(Up) ++ ",'down':" ++ integer_to_list(Down) ++ ",'quota': 0}")).
+    case get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'up':" ++ integer_to_list(Up) ++ ",'down':" ++ integer_to_list(Down) ++ ",'quota': 0}")) of
+        {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
+        Any -> Any
+    end.
 
 %% @doc Generate voucher(s)<br/>
 %% Expires -- Minutes to voucher expires<br/>
@@ -262,9 +270,12 @@ gen_voucher(Opts, Expires, Count, Up, Down) ->
 %% Quota   -- download quota, MB<br/>
 %% Return token: create_time<br/>
 %% @end
--spec(gen_voucher(Opts :: opt_list(), Expires :: integer(), Count :: integer(), Up :: integer(), Down :: integer(), Quota :: integer()) -> {ok, [tuple()]} | {error, Reply :: string()}).
+-spec(gen_voucher(Opts :: opt_list(), Expires :: integer(), Count :: integer(), Up :: integer(), Down :: integer(), Quota :: integer()) -> {ok, token()} | {error, Reply :: string()}).
 gen_voucher(Opts, Expires, Count, Up, Down, Quota) ->
-    get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'up':" ++ integer_to_list(Up) ++ ",'down':" ++ integer_to_list(Down) ++ ",'bytes':" ++ integer_to_list(Quota) ++ ",'quota': 0}")).
+    case get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'up':" ++ integer_to_list(Up) ++ ",'down':" ++ integer_to_list(Down) ++ ",'bytes':" ++ integer_to_list(Quota) ++ ",'quota': 0}")) of
+        {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
+        Any -> Any
+    end.
 
 
 %% @doc Generate one-time used voucher(s)<br/>
@@ -272,9 +283,12 @@ gen_voucher(Opts, Expires, Count, Up, Down, Quota) ->
 %% Count   -- count vouchers to generate<br/>
 %% Return token: create_time<br/>
 %% @end
--spec(gen_voucher_ot(Opts :: opt_list(), Expires :: integer(), Count :: integer()) -> {ok, [tuple()]} | {error, Reply :: string()}).
+-spec(gen_voucher_ot(Opts :: opt_list(), Expires :: integer(), Count :: integer()) -> {ok, token()} | {error, Reply :: string()}).
 gen_voucher_ot(Opts, Expires, Count) ->
-    get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'quota': 1}")).
+    case get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'quota': 1}")) of
+        {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
+        Any -> Any
+    end.
 
 %% @doc Generate one-time used voucher(s)<br/>
 %% Expires -- Minutes to voucher expires<br/>
@@ -283,9 +297,12 @@ gen_voucher_ot(Opts, Expires, Count) ->
 %% Down    -- download bandwith, kbps<br/>
 %% Return token: create_time<br/>
 %% @end
--spec(gen_voucher_ot(Opts :: opt_list(), Expires :: integer(), Count :: integer(), Up :: integer(), Down :: integer()) -> {ok, [tuple()]} | {error, Reply :: string()}).
+-spec(gen_voucher_ot(Opts :: opt_list(), Expires :: integer(), Count :: integer(), Up :: integer(), Down :: integer()) -> {ok, token()} | {error, Reply :: string()}).
 gen_voucher_ot(Opts, Expires, Count, Up, Down) ->
-    get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'up':" ++ integer_to_list(Up) ++ ",'down':" ++ integer_to_list(Down) ++ ",'quota': 1}")).
+    case get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'up':" ++ integer_to_list(Up) ++ ",'down':" ++ integer_to_list(Down) ++ ",'quota': 1}")) of
+        {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
+        Any -> Any
+    end.
 
 %% @doc Generate one-time used voucher(s)<br/>
 %% Expires -- Minutes to voucher expires<br/>
@@ -295,15 +312,18 @@ gen_voucher_ot(Opts, Expires, Count, Up, Down) ->
 %% Quota   -- download quota, MB<br/>
 %% Return token: create_time<br/>
 %% @end
--spec(gen_voucher_ot(Opts :: opt_list(), Expires :: integer(), Count :: integer(), Up :: integer(), Down :: integer(), Quota :: integer()) -> {ok, [tuple()]} | {error, Reply :: string()}).
+-spec(gen_voucher_ot(Opts :: opt_list(), Expires :: integer(), Count :: integer(), Up :: integer(), Down :: integer(), Quota :: integer()) -> {ok, token()} | {error, Reply :: string()}).
 gen_voucher_ot(Opts, Expires, Count, Up, Down, Quota) ->
-    get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'up':" ++ integer_to_list(Up) ++ ",'down':" ++ integer_to_list(Down) ++ ",'bytes':" ++ integer_to_list(Quota) ++ ",'quota': 1}")).
+    case get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'up':" ++ integer_to_list(Up) ++ ",'down':" ++ integer_to_list(Down) ++ ",'bytes':" ++ integer_to_list(Quota) ++ ",'quota': 1}")) of
+        {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
+        Any -> Any
+    end.
 
 %% @doc Return generated voucher(s)
 %% @end
--spec(get_voucher(Opts :: opt_list(), Token :: integer()) -> {ok, [tuple()]} | {error, Reply :: string()}).
+-spec(get_voucher(Opts :: opt_list(), Token :: token()) -> {ok, [tuple()]} | {error, Reply :: string()}).
 get_voucher(Opts, Token) ->
-    get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "stat/voucher", proplists:get_value(cookie, Opts), list_to_binary("json={'create_time':" ++ integer_to_list(Token) ++ "}")).
+    get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "stat/voucher", proplists:get_value(cookie, Opts), list_to_binary("json={'create_time':" ++ Token ++ "}")).
 
 %% @doc Delete generated voucher
 %% @end

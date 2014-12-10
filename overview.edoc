@@ -1,4 +1,4 @@
 @author Andrey Andruschenko <apofiget@gmail.com>
-@version 0.3
+@version 0.4
 @title UniFi API
 @doc Library provide Erlang implementation of UniFi controller API. Module src/json2.erl i'm get from Yaws project.
