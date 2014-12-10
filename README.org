@@ -3,6 +3,10 @@
   Tested with APIv2.4.6 on Linux version of controller software.
   UniFi Controller: http://www.ubnt.com/download/?group=unifi-ap
 
+** Requirements
+    * Rebar (https://github.com/basho/rebar)
+    * ibrowse (https://github.com/cmullaparthi/ibrowse)
+
 ** API usage example
    At first, you need to login on to controller:
    
