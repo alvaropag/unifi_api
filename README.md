@@ -3,5 +3,56 @@
   Tested with APIv2.4.6 on Linux version of controller software.
   UniFi Controller: http://www.ubnt.com/download/?group=unifi-ap
 
-  Author: Andrey Andruschenko <apofiget@gmail.com>
-  License: GPLv2
+** API usage example
+   At first, you need to login on to controller:
+   
+   #+BEGIN_EXAMPLE Erlang
+   {ok, Opt} = unifi:login("https://localhost:8443/", "admin", "password").
+   {ok,[{url,"https://localhost:8443/"},
+     {cookie,"unifisession=42F0B9DB3DE405694C4157FC126CA83B"},
+     {path,"api/"}]}
+   #+END_EXAMPLE
+
+   , for v2 UniFi API, of
+
+   #+BEGIN_EXAMPLE Erlang
+   {ok, Opt} = unifi:login("https://localhost:8443/", "admin", "password", v3, "default").
+   {ok,[{url,"https://localhost:8443/"},
+     {cookie,"unifisession=42F0B9DB3DE405694C4157FC126CA83B"},
+     {path,"api/"}]}
+   #+END_EXAMPLE
+
+   , for v3 UniFi API. Then, if all ok, execute other API functions:
+
+   #+BEGIN_EXAMPLE Erlang
+   unifi:get_events(Opt, 1).
+   {ok,[{"_id","54881c367ef6b0e46e88b10b"},
+      {"ap","24:a4:3c:4c:e5:fb"},
+      {"datetime","2014-12-10T10:11:02Z"},
+      {"key","EVT_AP_Connected"},
+      {"msg","AP[14:ab:3f:4c:ef:fb] was connected"},
+      {"time",1418206262446}]}
+
+   unifi:get_wlans(Opt).
+   {ok,[{"_id","547d7f83920dc81a4385efe3"},
+      {"enabled",true},
+      {"hide_ssid",false},
+      {"is_guest",true},
+      {"name","GUEST"},
+      {"radius_ip_1",[]},
+      {"radius_port_1","1812"},
+      {"security","open"},
+      {"usergroup_id","547d7f35920dc81a3d85efe3"},
+      {"vlan","1000"},
+      {"vlan_enabled",true},
+      {"wep_idx","1"},
+      {"wpa_enc","auto"},
+      {"wpa_mode","auto"},
+      {"x_passphrase",[]},
+      {"x_radius_secret_1",[]},
+      {"x_wep",[]}]}
+   #+END_EXAMPLE
+   ,or something else.
+
+Sorry, but description of each function, now, read in comments of source code.
+Author: Andrey Andruschenko <apofiget@gmail.com>, license: GPLv2.
