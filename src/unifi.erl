@@ -9,7 +9,7 @@
 -module(unifi).
 -author("Andrey Andruschenko <apofiget@gmail.com>").
 
--export([login/3, login/5, logout/1, backup/1, 
+-export([login/3, login/5, logout/1, backup/1,
          get_alerts/1, get_alerts_unarchived/1, get_events/1,
          get_events/2, get_aps/1, get_alluser/3,
          get_alluser_offline/3, get_users/1, get_users_active/1,
@@ -213,8 +213,8 @@ auth_guest(Opts, Mac, Minutes) ->
 %% @end
 -spec(auth_guest(Opts :: opt_list(), Mac :: string(), Minutes :: integer(), Up :: integer(), Down :: integer()) -> {ok, [null]} | {error, Reply :: string()}).
 auth_guest(Opts, Mac, Minutes, Up, Down) ->
-    get_array(proplists:get_value(url, Opts) ++  proplists:get_value(path, Opts) ++ "cmd/stamgr", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'authorize-guest', 'mac':'" ++ Mac ++ 
-                                                                  "','minutes':" ++ integer_to_list(Minutes) ++ ",'up':" ++ integer_to_list(Up) ++ 
+    get_array(proplists:get_value(url, Opts) ++  proplists:get_value(path, Opts) ++ "cmd/stamgr", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'authorize-guest', 'mac':'" ++ Mac ++
+                                                                  "','minutes':" ++ integer_to_list(Minutes) ++ ",'up':" ++ integer_to_list(Up) ++
                                                                   ",'down':" ++ integer_to_list(Down) ++ "}")).
 %% @doc Authorize guest based on his MAC address.<br/>
 %%   Mac     -- the guest MAC address: "aa:bb:cc:dd:ee:ff"<br/>
@@ -225,9 +225,9 @@ auth_guest(Opts, Mac, Minutes, Up, Down) ->
 %% @end
 -spec(auth_guest(Opts :: opt_list(), Mac :: string(), Minutes :: integer(), Up :: integer(), Down :: integer(), Quota :: integer()) -> {ok, [null]} | {error, Reply :: string()}).
 auth_guest(Opts, Mac, Minutes, Up, Down, Quota) ->
-    get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/stamgr", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'authorize-guest', 'mac':'" ++ Mac ++ 
-                                                                  "','minutes':" ++ integer_to_list(Minutes) ++ ",'up':" ++ integer_to_list(Up) ++ 
-                                                                  ",'down':" ++ integer_to_list(Down) ++ 
+    get_array(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/stamgr", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'authorize-guest', 'mac':'" ++ Mac ++
+                                                                  "','minutes':" ++ integer_to_list(Minutes) ++ ",'up':" ++ integer_to_list(Up) ++
+                                                                  ",'down':" ++ integer_to_list(Down) ++
                                                                   ",'bytes':" ++ integer_to_list(Quota) ++ "}")).
 %% @doc Unauthorize guest based on his MAC address.
 %% @end
@@ -335,27 +335,27 @@ del_voucher(Opts, Id) ->
 %% @hidden
 get_array(Url, Cookie, Request) ->
     case ibrowse:send_req(Url, [{"Content-Type", "application/x-www-form-urlencoded"},{cookie, Cookie}], post, Request, conn_opts()) of
-        {ok, "200", Headers, Body} -> 
-            case proplists:get_value("Content-Type", Headers) of
+        {ok, "200", Headers, Body} ->
+            case hd(string:tokens(proplists:get_value("Content-Type", Headers), ";")) of
                 "application/json" -> parse_json_obj(Body);
                 Any -> Any
             end;
         Any -> Any
     end.
 
-%% SSL connection options: only crypt connection, 
+%% SSL connection options: only crypt connection,
 %% peer certificate verifycation always success
 %% @hidden
 conn_opts() ->
-    [{is_ssl, true}, {ssl_options,[{versions,[tlsv1]}, {verify, verify_peer}, 
+    [{is_ssl, true}, {ssl_options,[{versions,[tlsv1]}, {verify, verify_peer},
      {verify_fun,{fun(_,{_, _}, UserState) -> {valid, UserState} end, []}},
      {secure_renegotiate, true}, {depth, 4}, {fail_if_no_peer_cert, false}]}].
 
 %% Deserialize JSON representation to Erlang proplist
 %% @hidden
 json2proplist(List) when is_list(List) ->
-    lists:map(fun({Name, {struct, E}}) -> {Name, E}; 
-               ({Name, {array, [{struct, E}]}}) -> {Name, E}; 
+    lists:map(fun({Name, {struct, E}}) -> {Name, E};
+               ({Name, {array, [{struct, E}]}}) -> {Name, E};
                ({Name, {array, E}}) -> {Name, E};
                ({Name, [{struct,E}]}) -> {Name, E};
                ({struct, L}) -> L;
