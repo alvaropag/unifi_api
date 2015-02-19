@@ -9,7 +9,7 @@
 
 ** API usage example
    At first, you need to login on to controller:
-   
+
    #+BEGIN_EXAMPLE Erlang
    {ok, Opt} = unifi:login("https://localhost:8443/", "admin", "password").
    {ok,[{url,"https://localhost:8443/"},
@@ -17,7 +17,7 @@
      {path,"api/"}]}
    #+END_EXAMPLE
 
-   , for v2 UniFi API, of
+   , for v2 UniFi API, or
 
    #+BEGIN_EXAMPLE Erlang
    {ok, Opt} = unifi:login("https://localhost:8443/", "admin", "password", v3, "default").
