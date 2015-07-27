@@ -69,7 +69,7 @@ login(Url, Login, Pass, Version, Site) ->
                 [{ok, "200", Headers, _},v4] ->
                     {ok, [
                           {url, Url},
-                          {cookie, string:strip(hd(string:tokens(proplists:get_value("Set-Cookie",Headers)," ")), right,$;)},
+                          {cookie, string:strip(hd(string:tokens(proplists:get_value("Set-Cookie",Headers)," ")),right,$;)},
                           {path, proplists:get_value(path, VerDepOpts)}]};
                 [{ok, "200", _, _},_] -> {error, "Login failed"};
                 [{ok, _, _, Body},_] -> {error, Body}
