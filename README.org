@@ -17,16 +17,26 @@
      {path,"api/"}]}
    #+END_EXAMPLE
 
-   , for v2 UniFi API, or
+   , for v2 UniFi API,
 
    #+BEGIN_EXAMPLE Erlang
    {ok, Opt} = unifi:login("https://localhost:8443/", "admin", "password", v3, "default").
    {ok,[{url,"https://localhost:8443/"},
      {cookie,"unifisession=42F0B9DB3DE405694C4157FC126CA83B"},
-     {path,"api/"}]}
+     {path,"api/s/default"}]}
    #+END_EXAMPLE
 
-   , for v3 UniFi API. Then, if all ok, execute other API functions:
+   , for v3 UniFi API or
+
+   #+BEGIN_EXAMPLE Erlang
+   {ok, Opt} = unifi:login("https://localhost:8443/", "admin", "password", v4, "default").
+   {ok,[{url,"https://localhost:8443/"},
+     {cookie,"unifisession=42F0B9DB3DE405694C4157FC126CA83B"},
+     {path,"api/s/default"}]}
+   #+END_EXAMPLE
+
+   , for v4 UniFi API.
+    Then, if all ok, execute other API functions:
 
    #+BEGIN_EXAMPLE Erlang
    unifi:get_events(Opt, 1).

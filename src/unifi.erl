@@ -1,6 +1,6 @@
 %% -*- coding: utf-8 -*-
 %% @author Andrey Andruschenko <apofiget@gmail.com>
-%% @version 0.3
+%% @version 0.5
 %% @doc UniFi controller API, tested with v2.4.6
 %% @reference <a href="http://www.ubnt.com/download/?group=unifi-ap">UniFi controller download</a>;
 %% @reference <a href="http://wiki.ubnt.com/UniFi_FAQ">UniFi FAQ</a>;
@@ -38,22 +38,41 @@
 %% @end
 -spec(login(Url :: string, Login :: string(), Pass :: string()) -> {ok, opt_list()} | {error, Reply :: string()}).
 login(Url, Login, Pass) -> login(Url, Login, Pass, v2, "").
-%% @doc Open session. Same as above, but for v3 API.
-%% For UniFi controller v3: Version and Site needed, default site name - "default"
+%% @doc Open session. Same as above, but for v3/V4 API.
+%% For UniFi controller v3/V4: Version and Site required, default site name - "default"
 %% @end
 -spec(login(Url :: string, Login :: string(), Pass :: string(), Version :: version(), Site :: string()) -> {ok, opt_list()} | {error, Reply :: string()}).
 login(Url, Login, Pass, Version, Site) ->
     try [ok,ok,ok,ok,ok] = [application:ensure_started(A) || A <- [asn1, crypto, public_key, ssl, ibrowse]] of
         _ ->
-            Path = case Version of
-                       v3 -> "api/s/" ++ Site ++ "/";
-                       _ -> "api/"
-                   end,
-            case ibrowse:send_req(Url ++ "login", [{"Content-Type", "application/x-www-form-urlencoded"}], post, "login=Login&username="++Login++"&password="++Pass, conn_opts()) of
-                {error, Reason} -> {error, Reason};
-                {ok, "302",Headers, _} -> {ok, [{url, Url}, {cookie, string:strip(hd(string:tokens(proplists:get_value("Set-Cookie", Headers), " ")), right, $;)}, {path, Path}]};
-                {ok, "200", _, _} -> {error, "Login failed"};
-                {ok, _, _, Body} -> {error, Body}
+            VerDepOpts = case Version of
+                             v2 -> [{path, "api/"}, {login_path, "login"},
+                                    {credentials, "login=Login&username="++Login++"&password="++Pass}];
+                             _  -> [{path, "api/s/" ++ Site ++ "/"}, {login_path, "api/login"},
+                                    {credentials, json2:encode(json2:obj_from_list([{username, Login}, {password, Pass}]))}]
+                         end,
+            Reply = ibrowse:send_req(Url ++ proplists:get_value(login_path, VerDepOpts),
+                                     [{"Content-Type", "application/x-www-form-urlencoded"}], post,
+                                     proplists:get_value(credentials, VerDepOpts), conn_opts()),
+            case [Reply, Version ] of
+                [{error, Reason},_] -> {error, Reason};
+                [{ok, "302",Headers, _},v2] ->
+                    {ok, [
+                          {url, Url},
+                          {cookie, string:strip(hd(string:tokens(proplists:get_value("Set-Cookie",Headers),"")),right,$;)},
+                          {path, proplists:get_value(path,VerDepOpts)}]};
+                [{ok, "302",Headers, _},v3] ->
+                    {ok, [
+                          {url, Url},
+                          {cookie, string:strip(hd(string:tokens(proplists:get_value("Set-Cookie",Headers),"")),right,$;)},
+                          {path, proplists:get_value(path, VerDepOpts)}]};
+                [{ok, "200", Headers, _},v4] ->
+                    {ok, [
+                          {url, Url},
+                          {cookie, string:strip(hd(string:tokens(proplists:get_value("Set-Cookie",Headers)," ")), right,$;)},
+                          {path, proplists:get_value(path, VerDepOpts)}]};
+                [{ok, "200", _, _},_] -> {error, "Login failed"};
+                [{ok, _, _, Body},_] -> {error, Body}
             end
     catch _:_ ->
             {error, "Some dependence application not stated"}
@@ -88,7 +107,7 @@ backup(Opts) ->
                                               end;
                                           Any -> Any
                                       end;
-                    _ -> {error, Body}
+                _ -> {error, Body}
             end;
         {ok, "302", _, _} -> {error, "Authorization required!"};
         {ok, _, _, Body} -> {error, Body};
@@ -214,8 +233,8 @@ auth_guest(Opts, Mac, Minutes) ->
 -spec(auth_guest(Opts :: opt_list(), Mac :: string(), Minutes :: integer(), Up :: integer(), Down :: integer()) -> {ok, [null]} | {error, Reply :: string()}).
 auth_guest(Opts, Mac, Minutes, Up, Down) ->
     send_req(proplists:get_value(url, Opts) ++  proplists:get_value(path, Opts) ++ "cmd/stamgr", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'authorize-guest', 'mac':'" ++ Mac ++
-                                                                  "','minutes':" ++ integer_to_list(Minutes) ++ ",'up':" ++ integer_to_list(Up) ++
-                                                                  ",'down':" ++ integer_to_list(Down) ++ "}")).
+                                                                                                                                                       "','minutes':" ++ integer_to_list(Minutes) ++ ",'up':" ++ integer_to_list(Up) ++
+                                                                                                                                                       ",'down':" ++ integer_to_list(Down) ++ "}")).
 %% @doc Authorize guest based on his MAC address.<br/>
 %%   Mac     -- the guest MAC address: "aa:bb:cc:dd:ee:ff"<br/>
 %%   Minutes -- duration of the authorization in minutes<br/>
@@ -226,9 +245,9 @@ auth_guest(Opts, Mac, Minutes, Up, Down) ->
 -spec(auth_guest(Opts :: opt_list(), Mac :: string(), Minutes :: integer(), Up :: integer(), Down :: integer(), Quota :: integer()) -> {ok, [null]} | {error, Reply :: string()}).
 auth_guest(Opts, Mac, Minutes, Up, Down, Quota) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/stamgr", proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'authorize-guest', 'mac':'" ++ Mac ++
-                                                                  "','minutes':" ++ integer_to_list(Minutes) ++ ",'up':" ++ integer_to_list(Up) ++
-                                                                  ",'down':" ++ integer_to_list(Down) ++
-                                                                  ",'bytes':" ++ integer_to_list(Quota) ++ "}")).
+                                                                                                                                                      "','minutes':" ++ integer_to_list(Minutes) ++ ",'up':" ++ integer_to_list(Up) ++
+                                                                                                                                                      ",'down':" ++ integer_to_list(Down) ++
+                                                                                                                                                      ",'bytes':" ++ integer_to_list(Quota) ++ "}")).
 %% @doc Unauthorize guest based on his MAC address.
 %% @end
 -spec(unauth_guest(Opts :: opt_list(), Mac :: string()) -> {ok, [null]} | {error, Reply :: string()}).
@@ -349,18 +368,18 @@ send_req(Url, Cookie, Request) ->
 %% @hidden
 conn_opts() ->
     [{is_ssl, true}, {ssl_options,[{versions,[tlsv1]}, {verify, verify_peer},
-     {verify_fun,{fun(_,{_, _}, UserState) -> {valid, UserState} end, []}},
-     {secure_renegotiate, true}, {depth, 4}, {fail_if_no_peer_cert, false}]}].
+                                   {verify_fun,{fun(_,{_, _}, UserState) -> {valid, UserState} end, []}},
+                                   {secure_renegotiate, true}, {depth, 4}, {fail_if_no_peer_cert, false}]}].
 
 %% Deserialize JSON representation to Erlang proplist
 %% @hidden
 json2proplist(List) when is_list(List) ->
     lists:map(fun({Name, {struct, E}}) -> {Name, E};
-               ({Name, {array, [{struct, E}]}}) -> {Name, E};
-               ({Name, {array, E}}) -> {Name, E};
-               ({Name, [{struct,E}]}) -> {Name, E};
-               ({struct, L}) -> L;
-               (E) -> E end , List);
+                 ({Name, {array, [{struct, E}]}}) -> {Name, E};
+                 ({Name, {array, E}}) -> {Name, E};
+                 ({Name, [{struct,E}]}) -> {Name, E};
+                 ({struct, L}) -> L;
+                 (E) -> E end , List);
 json2proplist(E) -> E.
 
 
@@ -372,10 +391,10 @@ parse_json_obj(Json) ->
             {struct,Meta} = proplists:get_value("meta", Struct),
             ReplyCode = proplists:get_value("rc", Meta),
             if ReplyCode =:= "ok" ->
-               case proplists:get_value("data", Struct) of
-                  {array,[{struct, Array}]} -> {ok, [{K,json2proplist(V)} || {K,V} <- json2proplist(Array)]};
-                  {array,Structs} -> {ok, [ json2proplist(L)|| L <- json2proplist(Structs)]}
-               end;
+                    case proplists:get_value("data", Struct) of
+                        {array,[{struct, Array}]} -> {ok, [{K,json2proplist(V)} || {K,V} <- json2proplist(Array)]};
+                        {array,Structs} -> {ok, [ json2proplist(L)|| L <- json2proplist(Structs)]}
+                    end;
                true ->
                     {error, proplists:get_value("msg", Meta)}
             end;
