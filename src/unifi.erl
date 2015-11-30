@@ -1,7 +1,7 @@
 %% -*- coding: utf-8 -*-
 %% @author Andrey Andruschenko <apofiget@gmail.com>
-%% @version 0.5
-%% @doc UniFi controller API, tested with v2.4.6
+%% @version 0.6
+%% @doc UniFi controller API, tested with v2.4.6, v4.7.5
 %% @reference <a href="http://www.ubnt.com/download/?group=unifi-ap">UniFi controller download</a>;
 %% @reference <a href="http://wiki.ubnt.com/UniFi_FAQ">UniFi FAQ</a>;
 %% @reference <a href="http://community.ubnt.com/t5/tkb/communitypage">UniFi community knowledge base</a>
@@ -19,7 +19,8 @@
          auth_guest/5, auth_guest/6, unauth_guest/2,
          gen_voucher/3, gen_voucher/5, gen_voucher/6,
          gen_voucher_ot/3, gen_voucher_ot/5, gen_voucher_ot/6,
-         get_voucher/2, del_voucher/2]).
+         get_voucher/2, del_voucher/2, get_users_active_by_ip/2,
+         get_users_active_by_mac/2, get_users_active_by_propertie/3]).
 
 
 -type user_type() :: all | guest | user | noted | blocked.
@@ -194,6 +195,43 @@ get_users(Opts) ->
 get_users_active(Opts) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "stat/sta",
              proplists:get_value(cookie, Opts), <<"json={}">>).
+
+%% @doc Return a properties list of client with given IP address.
+%% @end
+-spec(get_users_active_by_ip(Opts :: opt_list(), IP :: string()) -> {ok, [User :: list()]} |
+                                                                    {error,Reply :: string()}).
+get_users_active_by_ip(Opts, IP) ->
+    get_users_active_by_propertie(Opts, "ip", IP).
+
+%% @doc Return a properties list of client with given MAC address.
+%% @end
+-spec(get_users_active_by_mac(Opts :: opt_list(), MAC :: string()) -> {ok, [User :: list()]} |
+                                                                      {error,Reply :: string()}).
+get_users_active_by_mac(Opts, MAC) ->
+    get_users_active_by_propertie(Opts, "mac", MAC).
+
+%% @doc Return a properties list of client(s) which proppertie PropertieName
+%% have a value ProppertieValue.
+%% @end
+-spec(get_users_active_by_propertie(Opts :: opt_list(), PropName :: string(), PropValue :: string()) -> {ok, [User :: list()]} |
+                                                                                                        {error,Reply :: string()}).
+get_users_active_by_propertie(Opts, PropertieName, PropertieValue) ->
+    case get_users_active(Opts) of
+        {ok, ClientsList} ->
+            FilteredList = lists:filter(fun(E) ->
+                                                case proplists:get_value(PropertieName, E) of
+                                                    undefined -> false;
+                                                    PropertieValue -> true;
+                                                    _ -> false
+                                                end
+                                        end,
+                                        ClientsList),
+            case FilteredList of
+                [] -> {ok, []};
+                List -> {ok, List}
+            end;
+        Any -> Any
+    end.
 
 %% @doc Return a list of user groups with its settings.
 %% @end
