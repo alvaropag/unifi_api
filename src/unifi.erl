@@ -217,6 +217,11 @@ get_users_active_by_mac(Opts, MAC) ->
                                                                                                         {error,Reply :: string()}).
 get_users_active_by_propertie(Opts, PropertieName, PropertieValue) ->
     case get_users_active(Opts) of
+        {ok, [H|_] = Client} when is_tuple(H) ->
+            case proplists:get_value(PropertieName, Client) of
+                PropertieValue -> {ok, [Client]};
+                _ -> {ok,[]}
+            end;
         {ok, ClientsList} ->
             FilteredList = lists:filter(fun(E) ->
                                                 case proplists:get_value(PropertieName, E) of

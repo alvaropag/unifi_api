@@ -1,4 +1,0 @@
-%% encoding: UTF-8
-{application,unifi_lib}.
-{packages,[]}.
-{modules,[json2,unifi]}.
