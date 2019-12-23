@@ -1,5 +1,5 @@
-REBAR = `which rebar`
-
+;REBAR = `which rebar`
+REBAR = './rebar'
 compile:
 	@(if test ! -d "deps"; then mkdir deps ; fi)
 	@$(REBAR) get-deps

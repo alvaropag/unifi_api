@@ -469,10 +469,12 @@ send_req(Url, Cookie, Request) ->
     end.
 
 %% SSL connection options: only crypt connection,
-%% peer certificate verifycation always success
+%% peer certificate verifycation always success \
 %% @hidden
 conn_opts() ->
-    [{is_ssl, true}, {ssl_options,[{versions,[tlsv1]}, {verify, verify_peer},
+    [{is_ssl, true}, {ssl_options,[{versions,['tlsv1.2']}, 
+        {verify, verify_peer},
+        %{verify, verify_none},
                                    {verify_fun,{fun(_,{_, _}, UserState) -> {valid, UserState} end, []}},
                                    {secure_renegotiate, true}, {depth, 4}, {fail_if_no_peer_cert, false}]}].
 
