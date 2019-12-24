@@ -96,7 +96,7 @@ backup(Opts) ->
     case ibrowse:send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++
                               "cmd/system",
                           [{"Content-Type", "application/x-www-form-urlencoded"},
-                           {cookie, proplists:get_value(cookie, Opts)}], post, <<"json={'cmd':'backup'}">> , conn_opts()) of
+                           {cookie, proplists:get_value(cookie, Opts)}], post, <<"json={\"cmd\":\"backup\"}">> , conn_opts()) of
         {ok, "200", Headers, Body} ->
             case proplists:get_value("Content-Type", Headers) of
                 "application/json" -> R = parse_json_obj(Body),
@@ -126,21 +126,21 @@ backup(Opts) ->
 -spec(get_alerts_unarchived(Opts :: opt_list()) -> {ok, [Alers :: list()]} | {error, Reply :: string()}).
 get_alerts_unarchived(Opts) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "list/alarm",
-             proplists:get_value(cookie, Opts), <<"json={'_sort':'-time','archived':false}">>).
+             proplists:get_value(cookie, Opts), <<"json={\"_sort\":\"-time\",\"archived\":false}">>).
 
 %% @doc Return list of all alerts
 %% @end
 -spec(get_alerts(Opts :: opt_list()) -> {ok, [Alers :: list()]} | {error, Reply :: string()}).
 get_alerts(Opts) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "list/alarm",
-             proplists:get_value(cookie, Opts), <<"json={'_sort':'-time'}">>).
+             proplists:get_value(cookie, Opts), <<"json={\"_sort\":\"-time\"}">>).
 
 %% @doc Archive active alerts
 %% @end
 -spec(archive_alerts(Opts :: opt_list()) -> {ok, [none]} | {error, Reply :: string()}).
 archive_alerts(Opts) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/evtmgr",
-             proplists:get_value(cookie, Opts), <<"json={'cmd':'archive-all-alarms'}">>).
+             proplists:get_value(cookie, Opts), <<"json={\"cmd\":\"archive-all-alarms\"}">>).
 
 %% @doc Return list of all events
 %% @end
@@ -154,33 +154,33 @@ get_events(Opts) ->
 -spec(get_events(Opts :: opt_list(), Hours :: integer()) -> {ok, [Events :: list()]} | {error, Reply :: string()}).
 get_events(Opts, Hours) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "stat/event",
-             proplists:get_value(cookie, Opts), list_to_binary("json={'within':'" ++
-                                                                   integer_to_list(Hours) ++ "'}")).
+             proplists:get_value(cookie, Opts), list_to_binary("json={\"within\":\"" ++
+                                                                   integer_to_list(Hours) ++ "\"}")).
 
-%% @doc Return list of AP's with options
+%% @doc Return list of AP\"s with options
 %% @end
 -spec(get_aps(Opts :: opt_list()) -> {ok, [Ap :: list()]} | {error, Reply :: string()}).
 get_aps(Opts) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "stat/device",
-             proplists:get_value(cookie, Opts), <<"json={'_depth': 1, 'test': null}">>).
+             proplists:get_value(cookie, Opts), <<"json={\"_depth\": 1, \"test\": null}">>).
 
 %% @doc Return a list of all known clients, with detailed information about each.
 %% @end
 -spec(get_alluser(Opts :: opt_list(), Type :: user_type(), Hours :: integer()) -> {ok, [User :: list()]} | {error, Reply :: string()}).
 get_alluser(Opts, Type, Hours) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "stat/alluser",
-             proplists:get_value(cookie, Opts), list_to_binary("json={'type':'"++
-                                                                   atom_to_list(Type) ++"','is_offline':false,'within':'"++
-                                                                   integer_to_list(Hours) ++"'}")).
+             proplists:get_value(cookie, Opts), list_to_binary("json={\"type\":\""++
+                                                                   atom_to_list(Type) ++"\",\"is_offline\":false,\"within\":\""++
+                                                                   integer_to_list(Hours) ++"\"}")).
 
 %% @doc Return a list of all known offline clients, with detailed information about each.
 %% @end
 -spec(get_alluser_offline(Opts :: opt_list(), Type :: user_type(), Hours :: integer()) -> {ok, [User :: list()]} | {error, Reply :: string()}).
 get_alluser_offline(Opts, Type, Hours) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "stat/alluser",
-             proplists:get_value(cookie, Opts), list_to_binary("json={'type':'"++
-                                                                   atom_to_list(Type) ++"','is_offline':true,'within':'"++
-                                                                   integer_to_list(Hours) ++"'}")).
+             proplists:get_value(cookie, Opts), list_to_binary("json={\"type\":\""++
+                                                                   atom_to_list(Type) ++"\",\"is_offline\":true,\"within\":\""++
+                                                                   integer_to_list(Hours) ++"\"}")).
 
 %% @doc Return a list of all known clients, with significant information about each.
 %% @end
@@ -264,28 +264,28 @@ get_settings(Opts) ->
 -spec(block_client(Opts :: opt_list(), Mac :: string()) -> {ok, [null]} | {error, Reply :: string()}).
 block_client(Opts, Mac) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/stamgr",
-             proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'block-sta', 'mac':'"++ Mac ++"'}")).
+             proplists:get_value(cookie, Opts), list_to_binary("json={\"cmd\":\"block-sta\", \"mac\":\""++ Mac ++"\"}")).
 
 %% @doc Unblock wireless client with given MAC-address
 %% @end
 -spec(unblock_client(Opts :: opt_list(), Mac :: string()) -> {ok, [null]} | {error, Reply :: string()}).
 unblock_client(Opts, Mac) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/stamgr",
-             proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'unblock-sta', 'mac':'"++ Mac ++"'}")).
+             proplists:get_value(cookie, Opts), list_to_binary("json={\"cmd\":\"unblock-sta\", \"mac\":\""++ Mac ++"\"}")).
 
 %% @doc Disconnect wireless client with given MAC-address, forcing them to reassociate.
 %% @end
 -spec(disconnect_client(Opts :: opt_list(), Mac :: string()) -> {ok, [null]} | {error, Reply :: string()}).
 disconnect_client(Opts, Mac) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/stamgr",
-             proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'kick-sta', 'mac':'"++ Mac ++"'}")).
+             proplists:get_value(cookie, Opts), list_to_binary("json={\"cmd\":\"kick-sta\", \"mac\":\""++ Mac ++"\"}")).
 
 %% @doc Restart AP with given MAC-address.
 %% @end
 -spec(restart_ap(Opts :: opt_list(), Mac :: string()) -> {ok, [null]} | {error, Reply :: string()}).
 restart_ap(Opts, Mac) ->
     send_req(proplists:get_value(url, Opts) ++  proplists:get_value(path, Opts) ++ "cmd/devmgr",
-             proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'restart', 'mac':'"++ Mac ++"'}")).
+             proplists:get_value(cookie, Opts), list_to_binary("json={\"cmd\":\"restart\", \"mac\":\""++ Mac ++"\"}")).
 
 %% @doc Authorize guest based on his MAC address.<br/>
 %%   Mac     -- the guest MAC address: "aa:bb:cc:dd:ee:ff"<br/>
@@ -293,10 +293,10 @@ restart_ap(Opts, Mac) ->
 %% @end
 -spec(auth_guest(Opts :: opt_list(), Mac :: string(), Minutes :: integer()) -> {ok, [null]} | {error, Reply :: string()}).
 auth_guest(Opts, Mac, Minutes) ->
+    io:format("~p~n", [list_to_binary("json={\"cmd\":\"authorize-guest\",\"mac\":\"" ++ Mac ++ "\",\"minutes\":" ++ integer_to_list(Minutes) ++ "}")]),
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/stamgr",
              proplists:get_value(cookie, Opts),
-             list_to_binary("json={'cmd':'authorize-guest',
-                                   'mac':'" ++ Mac ++ "','minutes':" ++ integer_to_list(Minutes) ++ "}")).
+             list_to_binary("json={\"cmd\":\"authorize-guest\",\"mac\":\"" ++ Mac ++ "\",\"minutes\":" ++ integer_to_list(Minutes) ++ "}")).
 
 %% @doc Authorize guest based on his MAC address.<br/>
 %%   Mac     -- the guest MAC address: "aa:bb:cc:dd:ee:ff"<br/>
@@ -308,9 +308,9 @@ auth_guest(Opts, Mac, Minutes) ->
 auth_guest(Opts, Mac, Minutes, Up, Down) ->
     send_req(proplists:get_value(url, Opts) ++  proplists:get_value(path, Opts) ++ "cmd/stamgr",
              proplists:get_value(cookie, Opts),
-             list_to_binary("json={'cmd':'authorize-guest', 'mac':'" ++ Mac ++
-                                "','minutes':" ++ integer_to_list(Minutes) ++ ",'up':" ++ integer_to_list(Up) ++
-                                ",'down':" ++ integer_to_list(Down) ++ "}")).
+             list_to_binary("json={\"cmd\":\"authorize-guest\", \"mac\":\"" ++ Mac ++
+                                "\",\"minutes\":" ++ integer_to_list(Minutes) ++ ",\"up\":" ++ integer_to_list(Up) ++
+                                ",\"down\":" ++ integer_to_list(Down) ++ "}")).
 %% @doc Authorize guest based on his MAC address.<br/>
 %%   Mac     -- the guest MAC address: "aa:bb:cc:dd:ee:ff"<br/>
 %%   Minutes -- duration of the authorization in minutes<br/>
@@ -322,16 +322,16 @@ auth_guest(Opts, Mac, Minutes, Up, Down) ->
 auth_guest(Opts, Mac, Minutes, Up, Down, Quota) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/stamgr",
              proplists:get_value(cookie, Opts),
-             list_to_binary("json={'cmd':'authorize-guest', 'mac':'" ++ Mac ++
-                                "','minutes':" ++ integer_to_list(Minutes) ++ ",'up':" ++ integer_to_list(Up) ++
-                                ",'down':" ++ integer_to_list(Down) ++
-                                ",'bytes':" ++ integer_to_list(Quota) ++ "}")).
+             list_to_binary("json={\"cmd\":\"authorize-guest\", \"mac\":\"" ++ Mac ++
+                                "\",\"minutes\":" ++ integer_to_list(Minutes) ++ ",\"up\":" ++ integer_to_list(Up) ++
+                                ",\"down\":" ++ integer_to_list(Down) ++
+                                ",\"bytes\":" ++ integer_to_list(Quota) ++ "}")).
 %% @doc Unauthorize guest based on his MAC address.
 %% @end
 -spec(unauth_guest(Opts :: opt_list(), Mac :: string()) -> {ok, [null]} | {error, Reply :: string()}).
 unauth_guest(Opts, Mac) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/stamgr",
-             proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'unauthorize-guest', 'mac':'" ++ Mac ++ "'}")).
+             proplists:get_value(cookie, Opts), list_to_binary("json={\"cmd\":\"unauthorize-guest\", \"mac\":\"" ++ Mac ++ "\"}")).
 
 
 %% @doc Generate voucher(s)<br/>
@@ -343,8 +343,8 @@ unauth_guest(Opts, Mac) ->
 gen_voucher(Opts, Expires, Count) ->
     case send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot",
                   proplists:get_value(cookie, Opts),
-                  list_to_binary("json={'cmd':'create-voucher','expire':" ++
-                                     integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'quota': 0}")) of
+                  list_to_binary("json={\"cmd\":\"create-voucher\",\"expire\":" ++
+                                     integer_to_list(Expires) ++",\"n\":" ++ integer_to_list(Count) ++ ",\"quota\": 0}")) of
         {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
         Any -> Any
     end.
@@ -360,9 +360,9 @@ gen_voucher(Opts, Expires, Count) ->
 gen_voucher(Opts, Expires, Count, Up, Down) ->
     case send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot",
                   proplists:get_value(cookie, Opts),
-                  list_to_binary("json={'cmd':'create-voucher','expire':" ++
-                                     integer_to_list(Expires) ++",'n':" ++ integer_to_list(Count) ++ ",'up':" ++
-                                     integer_to_list(Up) ++ ",'down':" ++ integer_to_list(Down) ++ ",'quota': 0}")) of
+                  list_to_binary("json={\"cmd\":\"create-voucher\",\"expire\":" ++
+                                     integer_to_list(Expires) ++",\"n\":" ++ integer_to_list(Count) ++ ",\"up\":" ++
+                                     integer_to_list(Up) ++ ",\"down\":" ++ integer_to_list(Down) ++ ",\"quota\": 0}")) of
         {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
         Any -> Any
     end.
@@ -378,10 +378,10 @@ gen_voucher(Opts, Expires, Count, Up, Down) ->
 -spec(gen_voucher(Opts :: opt_list(), Expires :: integer(), Count :: integer(), Up :: integer(), Down :: integer(), Quota :: integer()) -> {ok, token()} | {error, Reply :: string()}).
 gen_voucher(Opts, Expires, Count, Up, Down, Quota) ->
     case send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts),
-                  list_to_binary("json={'cmd':'create-voucher','expire':" ++
-                                     integer_to_list(Expires) ++",'n':" ++
-                                     integer_to_list(Count) ++ ",'up':" ++ integer_to_list(Up) ++ ",'down':" ++
-                                     integer_to_list(Down) ++ ",'bytes':" ++ integer_to_list(Quota) ++ ",'quota': 0}")) of
+                  list_to_binary("json={\"cmd\":\"create-voucher\",\"expire\":" ++
+                                     integer_to_list(Expires) ++",\"n\":" ++
+                                     integer_to_list(Count) ++ ",\"up\":" ++ integer_to_list(Up) ++ ",\"down\":" ++
+                                     integer_to_list(Down) ++ ",\"bytes\":" ++ integer_to_list(Quota) ++ ",\"quota\": 0}")) of
         {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
         Any -> Any
     end.
@@ -395,9 +395,9 @@ gen_voucher(Opts, Expires, Count, Up, Down, Quota) ->
 -spec(gen_voucher_ot(Opts :: opt_list(), Expires :: integer(), Count :: integer()) -> {ok, token()} | {error, Reply :: string()}).
 gen_voucher_ot(Opts, Expires, Count) ->
     case send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot", proplists:get_value(cookie, Opts),
-                  list_to_binary("json={'cmd':'create-voucher','expire':" ++
-                                     integer_to_list(Expires) ++",'n':" ++
-                                     integer_to_list(Count) ++ ",'quota': 1}")) of
+                  list_to_binary("json={\"cmd\":\"create-voucher\",\"expire\":" ++
+                                     integer_to_list(Expires) ++",\"n\":" ++
+                                     integer_to_list(Count) ++ ",\"quota\": 1}")) of
         {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
         Any -> Any
     end.
@@ -413,9 +413,9 @@ gen_voucher_ot(Opts, Expires, Count) ->
 gen_voucher_ot(Opts, Expires, Count, Up, Down) ->
     case send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot",
                   proplists:get_value(cookie, Opts),
-                  list_to_binary("json={'cmd':'create-voucher','expire':" ++ integer_to_list(Expires) ++",'n':" ++
-                                     integer_to_list(Count) ++ ",'up':" ++ integer_to_list(Up) ++ ",'down':" ++
-                                     integer_to_list(Down) ++ ",'quota': 1}")) of
+                  list_to_binary("json={\"cmd\":\"create-voucher\",\"expire\":" ++ integer_to_list(Expires) ++",\"n\":" ++
+                                     integer_to_list(Count) ++ ",\"up\":" ++ integer_to_list(Up) ++ ",\"down\":" ++
+                                     integer_to_list(Down) ++ ",\"quota\": 1}")) of
         {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
         Any -> Any
     end.
@@ -432,10 +432,10 @@ gen_voucher_ot(Opts, Expires, Count, Up, Down) ->
 gen_voucher_ot(Opts, Expires, Count, Up, Down, Quota) ->
     case send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot",
                   proplists:get_value(cookie, Opts),
-                  list_to_binary("json={'cmd':'create-voucher','expire':" ++
-                                     integer_to_list(Expires) ++",'n':" ++
-                                     integer_to_list(Count) ++ ",'up':" ++ integer_to_list(Up) ++ ",'down':" ++
-                                     integer_to_list(Down) ++ ",'bytes':" ++ integer_to_list(Quota) ++ ",'quota': 1}")) of
+                  list_to_binary("json={\"cmd\":\"create-voucher\",\"expire\":" ++
+                                     integer_to_list(Expires) ++",\"n\":" ++
+                                     integer_to_list(Count) ++ ",\"up\":" ++ integer_to_list(Up) ++ ",\"down\":" ++
+                                     integer_to_list(Down) ++ ",\"bytes\":" ++ integer_to_list(Quota) ++ ",\"quota\": 1}")) of
         {ok, P} -> {ok, integer_to_list(proplists:get_value("create_time", P))};
         Any -> Any
     end.
@@ -445,18 +445,22 @@ gen_voucher_ot(Opts, Expires, Count, Up, Down, Quota) ->
 -spec(get_voucher(Opts :: opt_list(), Token :: token()) -> {ok, [tuple()]} | {error, Reply :: string()}).
 get_voucher(Opts, Token) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "stat/voucher",
-             proplists:get_value(cookie, Opts), list_to_binary("json={'create_time':" ++ Token ++ "}")).
+             proplists:get_value(cookie, Opts), list_to_binary("json={\"create_time\":" ++ Token ++ "}")).
 
 %% @doc Delete generated voucher
 %% @end
 -spec(del_voucher(Opts :: opt_list(), Id :: string()) -> {ok, [none]} | {error, Reply :: string()}).
 del_voucher(Opts, Id) ->
     send_req(proplists:get_value(url, Opts) ++ proplists:get_value(path, Opts) ++ "cmd/hotspot",
-             proplists:get_value(cookie, Opts), list_to_binary("json={'cmd':'delete-voucher','_id':'" ++ Id ++ "'}")).
+             proplists:get_value(cookie, Opts), list_to_binary("json={\"cmd\":\"delete-voucher\",\"_id\":\"" ++ Id ++ "\"}")).
 
 %% Get JSON from application service
 %% @hidden
 send_req(Url, Cookie, Request) ->
+    io:format("~p~n", [Url]),
+    io:format("~p~n", [Cookie]),
+    io:format("~p~n", [Request]),
+    %{"Content-Type", "application/x-www-form-urlencoded"}
     case ibrowse:send_req(Url, [{"Content-Type", "application/x-www-form-urlencoded"},{cookie, Cookie}],
                           post, Request, conn_opts()) of
         {ok, "200", Headers, Body} ->
@@ -464,7 +468,7 @@ send_req(Url, Cookie, Request) ->
                 "application/json" -> parse_json_obj(Body);
                 Any -> Any
             end;
-        {ok, _Code, _Headers, Body} -> {error, Body};
+        {ok, Code, Headers, Body} -> io:format("~p~n, ~p~n", [Code, Headers]), {error, Body};
         Any -> Any
     end.
 
